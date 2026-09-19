@@ -2,14 +2,21 @@ import type { Sample } from '../../shared/types';
 
 interface Props {
   sample: Sample | null;
-  elapsedMs: number;
-  running: boolean;
+  /** Current die diameter (from the linear transducer and the open diameter). */
+  diameterMm: number | null;
 }
 
-/** Live values of BOTH transducers, whichever mode is selected. */
-export function Readouts({ sample, elapsedMs, running }: Props) {
+/** Live values of BOTH transducers (plus the derived die diameter), whichever mode is selected. */
+export function Readouts({ sample, diameterMm }: Props) {
   return (
-    <div className="readouts">
+    <>
+      <div className="readout">
+        <span className="readout__label">Die diameter</span>
+        <span className="readout__value readout__value--dia">
+          {diameterMm !== null ? diameterMm.toFixed(2) : '--'}
+          <small>mm</small>
+        </span>
+      </div>
       <div className="readout">
         <span className="readout__label">Displacement</span>
         <span className="readout__value readout__value--disp">
@@ -24,12 +31,6 @@ export function Readouts({ sample, elapsedMs, running }: Props) {
           <small>bar</small>
         </span>
       </div>
-      <div className="readout readout--time">
-        <span className="readout__label">Cycle time</span>
-        <span className={`readout__time${running ? ' is-running' : ''}`}>
-          {(elapsedMs / 1000).toFixed(2)} s
-        </span>
-      </div>
-    </div>
+    </>
   );
 }

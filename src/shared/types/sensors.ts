@@ -48,4 +48,6 @@ export interface SensorStatus {
   connection: ConnectionStatus;
   /** Actual acquisition rate measured over the last second. */
   measuredRateHz: number;
+  /** Displacement zero offset set by "teach open position" (mm, 0 = not taught). */
+  zeroOffsetMm: number;
 }

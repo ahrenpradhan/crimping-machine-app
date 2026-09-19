@@ -11,6 +11,8 @@
  */
 export interface PlantParams {
   closeSpeedMmS: number;
+  /** Closing speed after the pressure mode's slow-down point. */
+  slowSpeedMmS: number;
   accelMmS2: number;
   decelMmS2: number;
   /** Die touches the workpiece at this displacement. */
@@ -29,14 +31,18 @@ export interface PlantParams {
   maxTravelMm: number;
 }
 
+// Tuned so the default job (74 mm open -> 32.2 mm target = ~41.8 mm stroke)
+// builds roughly 270 bar, and a 320 bar target lands near 44 mm of stroke.
+// The die touches the workpiece at 22 mm stroke (= 52 mm diameter).
 export const DEFAULT_PLANT_PARAMS: PlantParams = {
-  closeSpeedMmS: 10,
-  accelMmS2: 80,
+  closeSpeedMmS: 15,
+  slowSpeedMmS: 6,
+  accelMmS2: 120,
   decelMmS2: 400,
-  contactMm: 12,
+  contactMm: 22,
   freeTravelBar: 6,
   restBar: 1.5,
-  stiffness: 6.5,
+  stiffness: 5.5,
   exponent: 1.3,
   pressureTauS: 0.04,
   holdBeforeRetractS: 1.5,
@@ -50,6 +56,7 @@ export class SimulatedPlant {
   velocityMmS = 0;
 
   private closing = false;
+  private slow = false;
   private idleTimeS = 0;
 
   constructor(private readonly p: PlantParams = DEFAULT_PLANT_PARAMS) {
@@ -59,6 +66,10 @@ export class SimulatedPlant {
   setClosing(closing: boolean): void {
     this.closing = closing;
     if (closing) this.idleTimeS = 0;
+  }
+
+  setSlow(slow: boolean): void {
+    this.slow = slow;
   }
 
   isClosing(): boolean {
@@ -73,7 +84,7 @@ export class SimulatedPlant {
     if (this.closing) {
       // Ram slows as the load (pressure) builds up.
       const load = 1 - 0.5 * Math.min(1, this.pressureBar / 500);
-      const targetVelocity = p.closeSpeedMmS * load;
+      const targetVelocity = (this.slow ? p.slowSpeedMmS : p.closeSpeedMmS) * load;
       const maxDelta = p.accelMmS2 * dt;
       const delta = targetVelocity - this.velocityMmS;
       this.velocityMmS += Math.max(-maxDelta, Math.min(maxDelta, delta));

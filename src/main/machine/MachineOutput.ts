@@ -5,8 +5,13 @@
  * deliberately not written yet (Phase 6) - these classes only log, or drive the
  * simulator. A software output is never a substitute for hard-wired safety.
  */
+export type ClosingSpeed = 'FAST' | 'SLOW';
+
 export interface MachineOutput {
+  /** Starts closing at FAST speed. */
   startClosing(): void;
+  /** Changes speed while closing (used for the pressure mode's slow-down point). */
+  setClosingSpeed(speed: ClosingSpeed): void;
   stopClosing(): void;
   isClosing(): boolean;
 }
@@ -19,6 +24,10 @@ export class LogMachineOutput implements MachineOutput {
     if (this.closing) return;
     this.closing = true;
     console.log('[MachineOutput] START CLOSING');
+  }
+
+  setClosingSpeed(speed: ClosingSpeed): void {
+    if (this.closing) console.log(`[MachineOutput] CLOSING SPEED ${speed}`);
   }
 
   stopClosing(): void {
@@ -36,13 +45,22 @@ export class LogMachineOutput implements MachineOutput {
 export class SimulatedMachineOutput implements MachineOutput {
   private closing = false;
 
-  constructor(private readonly plant: { setClosing(closing: boolean): void }) {}
+  constructor(
+    private readonly plant: { setClosing(closing: boolean): void; setSlow(slow: boolean): void },
+  ) {}
 
   startClosing(): void {
     if (this.closing) return;
     this.closing = true;
+    this.plant.setSlow(false);
     this.plant.setClosing(true);
     console.log('[MachineOutput:SIM] START CLOSING');
+  }
+
+  setClosingSpeed(speed: ClosingSpeed): void {
+    if (!this.closing) return;
+    this.plant.setSlow(speed === 'SLOW');
+    console.log(`[MachineOutput:SIM] CLOSING SPEED ${speed}`);
   }
 
   stopClosing(): void {

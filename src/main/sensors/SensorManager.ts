@@ -38,6 +38,11 @@ export class SensorManager extends EventEmitter {
   private latest: Sample | null = null;
   private latestRaw: RawSample | null = null;
 
+  // "Teach open position": displacement zero offset (mm), applied to every sample.
+  private zeroOffsetMm = 0;
+  /** Last ~0.25 s of displacement readings BEFORE the zero offset, for teaching. */
+  private recentUncorrected: number[] = [];
+
   private health: SensorHealth = 'STARTING';
   private message: string | null = null;
   private consecutiveErrors = 0;
@@ -94,7 +99,27 @@ export class SensorManager extends EventEmitter {
       message: this.message,
       connection: this.client.getConnectionStatus(),
       measuredRateHz: this.measuredRateHz,
+      zeroOffsetMm: this.zeroOffsetMm,
     };
+  }
+
+  /**
+   * Declares the current ram position to be displacement = 0 (the open
+   * position). Uses the average of the last ~0.25 s so sensor noise is not
+   * baked into the offset. Returns false if there is no data yet.
+   * (Kept in memory only - there is no persistent storage in v1.)
+   */
+  teachDisplacementZero(): boolean {
+    if (this.recentUncorrected.length === 0) return false;
+    const sum = this.recentUncorrected.reduce((a, b) => a + b, 0);
+    this.zeroOffsetMm = sum / this.recentUncorrected.length;
+    if (this.latest) this.latest = { ...this.latest, displacementMm: 0 };
+    return true;
+  }
+
+  /** Removes the taught zero offset. */
+  resetDisplacementZero(): void {
+    this.zeroOffsetMm = 0;
   }
 
   // ---- Loop --------------------------------------------------------------
@@ -132,10 +157,12 @@ export class SensorManager extends EventEmitter {
         pressureRaw: raw.pressure,
         displacementRaw: raw.displacement,
       };
+      this.recentUncorrected.push(displacement.value);
+      if (this.recentUncorrected.length > 25) this.recentUncorrected.shift();
       this.latest = {
         timestamp,
         pressureBar: pressure.value,
-        displacementMm: displacement.value,
+        displacementMm: displacement.value - this.zeroOffsetMm,
       };
       this.onGoodRead();
       return this.latest;

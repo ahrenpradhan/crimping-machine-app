@@ -15,12 +15,17 @@
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "verify": "tsx scripts/verify-sim.ts",
     "dist": "npm run build && electron-builder",
-    "dist:pi": "npm run build && electron-builder --linux --arm64"
+    "dist:pi": "npm run build && electron-builder --linux --arm64",
+    "postinstall": "electron-rebuild -f -o better-sqlite3 || echo WARNING: better-sqlite3 was not rebuilt for Electron - see README",
+    "rebuild:native": "electron-rebuild -f -o better-sqlite3"
   },
   "dependencies": {
+    "better-sqlite3": "^11.10.0",
     "modbus-serial": "^8.0.17"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
+    "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^20.16.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
@@ -44,7 +49,8 @@
       "package.json"
     ],
     "asarUnpack": [
-      "**/node_modules/@serialport/**"
+      "**/node_modules/@serialport/**",
+      "**/node_modules/better-sqlite3/**"
     ],
     "directories": {
       "buildResources": "build",
@@ -62,6 +68,7 @@
       ],
       "category": "Utility",
       "maintainer": "RP Solders Pvt Ltd"
-    }
+    },
+    "npmRebuild": false
   }
 }

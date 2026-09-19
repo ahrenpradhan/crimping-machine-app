@@ -3,9 +3,10 @@ import type { AppInfo, SensorStatus } from '../../shared/types';
 interface Props {
   info: AppInfo | null;
   sensors: SensorStatus | null;
+  profileName: string;
 }
 
-export function Header({ info, sensors }: Props) {
+export function Header({ info, sensors, profileName }: Props) {
   const ok = sensors?.health === 'OK';
   const sensorText = !sensors
     ? 'Sensors: --'
@@ -19,6 +20,9 @@ export function Header({ info, sensors }: Props) {
     <header className="header">
       <h1>CRIMPING MACHINE</h1>
       <div className="header__right">
+        <span className="profile-pill" title="Active profile">
+          {profileName}
+        </span>
         <span className={`sensor-pill${ok ? ' is-ok' : sensors ? ' is-bad' : ''}`} title={sensorText}>
           <i className="dot" /> {sensorText}
         </span>

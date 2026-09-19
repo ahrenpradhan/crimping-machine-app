@@ -1,52 +1,111 @@
-import type { CrimpMode } from '../../shared/types';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 
 interface Props {
-  mode: CrimpMode;
-  value: string;
+  label: string;
+  unit: string;
+  value: number;
+  step: number;
+  decimals: number;
+  min: number;
   max: number;
-  disabled: boolean;
-  onChange: (value: string) => void;
+  disabled?: boolean;
+  /** Smaller variant for secondary parameters. */
+  compact?: boolean;
+  /** Main parameter of the screen: drawn with an accent label. */
+  primary?: boolean;
+  /** Small control shown on the label line, right-aligned (e.g. TEACH). */
+  action?: ReactNode;
+  onChange: (value: number) => void;
 }
 
-const CONFIG = {
-  LINEAR: { label: 'Target displacement', unit: 'mm', step: 0.5, decimals: 2 },
-  PRESSURE: { label: 'Target pressure', unit: 'bar', step: 5, decimals: 1 },
-} as const;
+const clamp = (v: number, min: number, max: number): number => Math.min(max, Math.max(min, v));
 
-/** Numeric target with -/+ buttons (touchscreen friendly - no keyboard needed). */
-export function TargetInput({ mode, value, max, disabled, onChange }: Props) {
-  const cfg = CONFIG[mode];
+/**
+ * Labelled numeric parameter with big -/+ buttons (touchscreen friendly - no
+ * keyboard needed). Typing also works; the value is clamped when the field
+ * loses focus.
+ */
+export function TargetInput({
+  label,
+  unit,
+  value,
+  step,
+  decimals,
+  min,
+  max,
+  disabled = false,
+  compact = false,
+  primary = false,
+  action,
+  onChange,
+}: Props) {
+  const id = useId();
+  const [draft, setDraft] = useState(value.toFixed(decimals));
+  const focused = useRef(false);
 
-  const nudge = (direction: 1 | -1): void => {
-    const current = Number(value) || 0;
-    const next = Math.min(max, Math.max(0, current + direction * cfg.step));
-    onChange(next.toFixed(cfg.decimals));
+  // Follow external changes (the -/+ buttons, stored values) unless typing.
+  useEffect(() => {
+    if (!focused.current) setDraft(value.toFixed(decimals));
+  }, [value, decimals]);
+
+  const commit = (n: number): void => {
+    onChange(Number(clamp(n, min, max).toFixed(decimals)));
   };
 
+  const nudge = (direction: 1 | -1): void => commit(value + direction * step);
+
   return (
-    <div className="target">
-      <label className="field-label" htmlFor="target-input">
-        {cfg.label}
-      </label>
-      <div className="target__row">
-        <button type="button" className="step-btn" disabled={disabled} onClick={() => nudge(-1)}>
+    <div className={`field${compact ? ' field--compact' : ''}${primary ? ' field--primary' : ''}`}>
+      <div className="field__head">
+        <label className="field-label" htmlFor={id}>
+          {label}
+        </label>
+        {action}
+      </div>
+      <div className="field__row">
+        <button
+          type="button"
+          className="step-btn"
+          disabled={disabled}
+          onClick={() => nudge(-1)}
+          aria-label={`Decrease ${label}`}
+        >
           -
         </button>
-        <div className="target__input-wrap">
+        <div className="field__input-wrap">
           <input
-            id="target-input"
+            id={id}
             type="number"
             inputMode="decimal"
-            min={0}
+            min={min}
             max={max}
-            step={cfg.step}
-            value={value}
+            step={step}
+            value={draft}
             disabled={disabled}
-            onChange={(e) => onChange(e.target.value)}
+            onFocus={() => {
+              focused.current = true;
+            }}
+            onBlur={() => {
+              focused.current = false;
+              const n = Number(draft);
+              if (draft.trim() !== '' && Number.isFinite(n)) commit(n);
+              setDraft(value.toFixed(decimals));
+            }}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              const n = Number(e.target.value);
+              if (e.target.value.trim() !== '' && Number.isFinite(n)) onChange(n);
+            }}
           />
-          <span className="target__unit">{cfg.unit}</span>
+          <span className="field__unit">{unit}</span>
         </div>
-        <button type="button" className="step-btn" disabled={disabled} onClick={() => nudge(1)}>
+        <button
+          type="button"
+          className="step-btn"
+          disabled={disabled}
+          onClick={() => nudge(1)}
+          aria-label={`Increase ${label}`}
+        >
           +
         </button>
       </div>

@@ -9,8 +9,8 @@ export class CycleRecorder {
   private samples: CycleSample[] = [];
   private peakPressureBar = 0;
 
-  /** 100 Hz x 60 s. The cycle timeout faults well before this. */
-  constructor(private readonly maxSamples = 6000) {}
+  /** 100 Hz x 90 s: 30 s cycle timeout + up to 30 s hold, with headroom. */
+  constructor(private readonly maxSamples = 9000) {}
 
   /** Start a fresh cycle (discards the previous one) and return its id. */
   begin(): number {

@@ -12,9 +12,22 @@ const machine: MachineApi = {
   getCycleData: () => ipcRenderer.invoke(IPC.getCycleData),
   getAppInfo: () => ipcRenderer.invoke(IPC.getAppInfo),
 
-  startLinearCrimp: (targetMm) => ipcRenderer.invoke(IPC.startLinear, targetMm),
-  startPressureCrimp: (targetBar) => ipcRenderer.invoke(IPC.startPressure, targetBar),
+  startLinearCrimp: (params, context) => ipcRenderer.invoke(IPC.startLinear, params, context),
+  startPressureCrimp: (params, context) => ipcRenderer.invoke(IPC.startPressure, params, context),
   stopCrimp: () => ipcRenderer.invoke(IPC.stop),
+  addRejected: () => ipcRenderer.invoke(IPC.addRejected),
+  resetCounters: () => ipcRenderer.invoke(IPC.resetCounters),
+  teachOpenPosition: () => ipcRenderer.invoke(IPC.teachOpen),
+
+  listProfiles: () => ipcRenderer.invoke(IPC.listProfiles),
+  createProfile: (name) => ipcRenderer.invoke(IPC.createProfile, name),
+  listRecipes: (profileId) => ipcRenderer.invoke(IPC.listRecipes, profileId),
+  saveRecipe: (recipe) => ipcRenderer.invoke(IPC.saveRecipe, recipe),
+  deleteRecipe: (id) => ipcRenderer.invoke(IPC.deleteRecipe, id),
+  importRecipes: (recipes) => ipcRenderer.invoke(IPC.importRecipes, recipes),
+  recipeStats: (profileId) => ipcRenderer.invoke(IPC.recipeStats, profileId),
+  listCycles: (query) => ipcRenderer.invoke(IPC.listCycles, query),
+  getCycleSamples: (id) => ipcRenderer.invoke(IPC.getCycleSamples, id),
 
   onTick: (callback) => {
     const listener = (_event: IpcRendererEvent, tick: UiTick): void => callback(tick);

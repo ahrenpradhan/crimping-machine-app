@@ -25,6 +25,8 @@ export interface TraceChartProps {
   xMax: number;
   yMax: number;
   target?: TargetLine | null;
+  /** Small tile: tiny fonts, no axis names (put the units in `title`). */
+  compact?: boolean;
 }
 
 const AXIS_COLOR = '#3a4a66';
@@ -32,36 +34,40 @@ const TEXT_COLOR = '#8a9bb4';
 const TARGET_COLOR = '#f87171';
 
 function buildOption(p: TraceChartProps): echarts.EChartsCoreOption {
+  const small = p.compact === true;
+  const labelSize = small ? 10 : 12;
   return {
     animation: false,
     backgroundColor: 'transparent',
-    grid: { left: 54, right: 18, top: 34, bottom: 38 },
+    grid: small
+      ? { left: 38, right: 10, top: 24, bottom: 18 }
+      : { left: 54, right: 18, top: 34, bottom: 38 },
     title: {
       text: p.title,
       left: 10,
-      top: 4,
-      textStyle: { color: '#c9d6ea', fontSize: 14, fontWeight: 600 },
+      top: small ? 3 : 4,
+      textStyle: { color: '#c9d6ea', fontSize: small ? 11 : 14, fontWeight: 600 },
     },
     xAxis: {
       type: 'value',
-      name: p.xName,
+      name: small ? '' : p.xName,
       nameLocation: 'middle',
       nameGap: 24,
       nameTextStyle: { color: TEXT_COLOR },
       min: p.xMin,
       max: p.xMax,
       axisLine: { lineStyle: { color: AXIS_COLOR } },
-      axisLabel: { color: TEXT_COLOR },
+      axisLabel: { color: TEXT_COLOR, fontSize: labelSize },
       splitLine: { lineStyle: { color: '#1b2740' } },
     },
     yAxis: {
       type: 'value',
-      name: p.yName,
+      name: small ? '' : p.yName,
       nameTextStyle: { color: TEXT_COLOR, align: 'left' },
       min: 0,
       max: p.yMax,
       axisLine: { show: true, lineStyle: { color: AXIS_COLOR } },
-      axisLabel: { color: TEXT_COLOR },
+      axisLabel: { color: TEXT_COLOR, fontSize: labelSize },
       splitLine: { lineStyle: { color: '#1b2740' } },
     },
     series: [
@@ -70,7 +76,7 @@ function buildOption(p: TraceChartProps): echarts.EChartsCoreOption {
         data: p.data,
         showSymbol: false,
         sampling: 'lttb',
-        lineStyle: { width: 2, color: p.color },
+        lineStyle: { width: small ? 1.5 : 2, color: p.color },
         itemStyle: { color: p.color },
         markLine: p.target
           ? {
@@ -80,6 +86,7 @@ function buildOption(p: TraceChartProps): echarts.EChartsCoreOption {
               lineStyle: { color: TARGET_COLOR, type: 'dashed', width: 1.5 },
               label: {
                 color: TARGET_COLOR,
+                fontSize: labelSize,
                 formatter: p.target.label,
                 position: 'insideEndTop',
               },

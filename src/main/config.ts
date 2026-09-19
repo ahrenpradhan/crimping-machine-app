@@ -8,7 +8,9 @@
  *   CRIMP_BAUD=38400
  *   CRIMP_KIOSK=1            fullscreen kiosk window
  *   CRIMP_DEVTOOLS=1         open DevTools
+ *   CRIMP_DB_PATH=...        SQLite file (default: <app data folder>/crimping.db)
  */
+import type { DieGeometry } from '../shared/linear';
 import type { SensorCalibration } from '../shared/types';
 
 function envFlag(name: string, fallback: boolean): boolean {
@@ -19,6 +21,13 @@ function envFlag(name: string, fallback: boolean): boolean {
 
 /** true = generated data, no hardware needed. */
 export const SIMULATION: boolean = envFlag('CRIMP_SIMULATION', true);
+
+/** SQLite history (recipes + every crimp cycle). */
+export const HISTORY = {
+  fileName: 'crimping.db',
+  /** Also store each cycle's recorded pressure/displacement curve (about 10 KB per cycle). */
+  logSamples: true,
+} as const;
 
 export const TIMING = {
   /** Sensor acquisition + machine logic rate. */
@@ -56,6 +65,20 @@ export const LIMITS = {
   /** How long TARGET_*_REACHED is shown/recorded before COMPLETE. */
   targetReachedHoldMs: 300,
 } as const;
+
+/**
+ * CRIMP BY LINEAR is set up in die diameters (like the Uniflex screen) but
+ * stops on the linear transducer's stroke:
+ *
+ *   diameter = openDiameter - diameterMmPerStrokeMm x displacement
+ *
+ * PLACEHOLDER: 1.0 means 1 mm of measured stroke closes the die by 1 mm of
+ * diameter. Set the real ratio for your machine (radial segments + ram
+ * geometry) - it directly decides where a diameter target stops the ram.
+ */
+export const GEOMETRY: DieGeometry = {
+  diameterMmPerStrokeMm: 1,
+};
 
 /** Sensor-manager behaviour. */
 export const ACQUISITION = {
