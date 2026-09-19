@@ -1,0 +1,67 @@
+{
+  "name": "crimping-machine-app",
+  "productName": "Crimping Machine Control",
+  "version": "0.1.0",
+  "description": "Bare-bones crimping machine controller: crimp by linear / by pressure, Modbus RTU sensors, live graphs",
+  "author": "RP Solders Pvt Ltd",
+  "main": "./out/main/index.js",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "dev:hw": "cross-env CRIMP_SIMULATION=false electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "start:hw": "cross-env CRIMP_SIMULATION=false electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "verify": "tsx scripts/verify-sim.ts",
+    "dist": "npm run build && electron-builder",
+    "dist:pi": "npm run build && electron-builder --linux --arm64"
+  },
+  "dependencies": {
+    "modbus-serial": "^8.0.17"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.0",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "cross-env": "^7.0.3",
+    "echarts": "^5.5.1",
+    "electron": "^32.1.2",
+    "electron-builder": "^25.0.5",
+    "electron-vite": "^2.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.8"
+  },
+  "build": {
+    "appId": "com.rpsolders.crimpingmachine",
+    "productName": "Crimping Machine Control",
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/node_modules/@serialport/**"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "sign": false
+    },
+    "forceCodeSigning": false,
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "maintainer": "RP Solders Pvt Ltd"
+    }
+  }
+}
