@@ -37,6 +37,7 @@ import { useCompact } from './hooks/useCompact';
 import { useProfiles } from './hooks/useProfiles';
 import { useRecipes } from './hooks/useRecipes';
 import { usePersistentState } from './hooks/usePersistentState';
+import { useTheme } from './hooks/useTheme';
 import { isBusyStatus } from './utils/status';
 
 const asRecipeId = (v: unknown): string | null => (typeof v === 'string' ? v : null);
@@ -48,6 +49,7 @@ const asMode = (v: unknown): CrimpMode | null => (v === 'LINEAR' || v === 'PRESS
  */
 export default function App() {
   const machine = useMachine();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   // Operator settings are remembered across restarts (no database in v1).
   const [mode, setMode] = usePersistentState<CrimpMode>('crimp.mode', 'LINEAR', asMode);
@@ -392,6 +394,8 @@ export default function App() {
         info={machine.info}
         sensors={machine.sensorStatus}
         profileName={profile.name}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {screen === 'HOME' && (

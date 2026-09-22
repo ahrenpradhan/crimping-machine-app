@@ -120,6 +120,10 @@ The zoom follows the window size (a short window on a big screen is not zoomed) 
 
 Standard layout: live die diameter / displacement / pressure and the piece counters on top, the parameters in a three-column grid (die size and open diameter - with its TEACH button - in the same place in both modes; the target first), then the status and the big START / STOP buttons; the graphs are tap-to-expand tiles on the right. The parameter rows use the free height (up to a touch-friendly maximum) and shrink on short screens; long fault / error texts are cut to one line (full text on hover) and only one message line is shown. The other screens (recipes, history table, profile, guide) scroll if they do not fit.
 
+### Dark / light mode
+
+The sun / moon icon at the right of the header toggles the theme. Dark is the default (unchanged from before the toggle existed); the choice is remembered per device (`localStorage`, `crimp.theme`) and applied to every screen, including the graphs (`TraceChart.tsx` reads the active theme's CSS custom properties - `--text`, `--muted`, `--chart-axis`, `--chart-split`, `--chart-target` - and rebuilds the ECharts option on toggle, since a `<canvas>` chart cannot follow CSS `var()`s on its own). All theme colors are CSS custom properties in `styles.css` (`:root` = dark, `:root[data-theme="light"]` = light overrides); low-alpha tint backgrounds (`--accent-rgb`, `--red-rgb`, etc.) stay the same triplet in both themes and only the paired text/border colors invert, so badges and pills keep working as pale tints on either background.
+
 ### Screens, profiles and recipes
 
 The app opens on a **home screen** with tiles: Crimp by pressure, Crimp by linear, Recipes, Guide / FAQ and Profile. The bottom bar (hidden on the home screen) has every option plus HOME, so any screen is one tap away.

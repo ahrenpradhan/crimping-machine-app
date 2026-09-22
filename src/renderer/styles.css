@@ -14,6 +14,90 @@
   --cyan: #22d3ee;
   --radius: 10px;
   color-scheme: dark;
+
+  /* Low-alpha tint overlays (rgba(var(--x-rgb), a)) - same triplets in both themes,
+     since they're only ever used as pale tints on top of the panel background. */
+  --red-rgb: 239, 68, 68;
+  --green-rgb: 34, 197, 94;
+  --amber-rgb: 245, 158, 11;
+  --accent-rgb: 56, 189, 248;
+  --hw-rgb: 59, 130, 246;
+  --slate-rgb: 148, 163, 184;
+  --backdrop-rgb: 3, 7, 18;
+
+  /* Text sitting on top of a translucent tinted background (badges, pills, chips) -
+     these need to flip to a darker shade in light mode to stay readable. */
+  --green-text-soft: #86efac;
+  --red-text-soft: #fca5a5;
+  --red-text-strong: #fecaca;
+  --amber-text-soft: #fcd34d;
+  --amber-text-soft-2: #fde68a;
+  --accent-text-soft: #e0f2fe;
+  --hw-text: #93c5fd;
+
+  --red-border: #7f1d1d;
+  --amber-border: #78560a;
+  --accent-border-soft: #1e5f8a;
+  --hw-border: #1e3a8a;
+
+  --idle-bg: #1f2a3f;
+  --idle-text: #cbd5e1;
+  --field-bg: #0e1626;
+  --nav-active-bg: #1a2a48;
+  --step-active-bg: #1f2f4f;
+  --ghost-active-bg: #1f2f52;
+  --cell-active-bg: #15203a;
+
+  --muted-soft: #b8c7de;
+  --muted-dim: #64748b;
+
+  /* Read by TraceChart.tsx (ECharts renders to canvas, so these can't be CSS var()s
+     inside the chart itself - the component reads the computed values instead). */
+  --chart-axis: #3a4a66;
+  --chart-split: #1b2740;
+  --chart-target: #f87171;
+}
+
+/* Light mode. Dark stays the default above - nothing changes until this
+   attribute is set, so nobody's screen shifts under them. */
+:root[data-theme='light'] {
+  --bg: #f3f6fb;
+  --panel: #ffffff;
+  --panel-2: #eef2f9;
+  --line: #d7dfec;
+  --text: #0f172a;
+  --muted: #5b6b85;
+  --accent: #0284c7;
+  --amber: #b45309;
+  --cyan: #0e7490;
+  color-scheme: light;
+
+  --green-text-soft: #15803d;
+  --red-text-soft: #b91c1c;
+  --red-text-strong: #7f1d1d;
+  --amber-text-soft: #8a5b06;
+  --amber-text-soft-2: #8a5b06;
+  --accent-text-soft: #075985;
+  --hw-text: #1e40af;
+
+  --red-border: #f1a7a7;
+  --amber-border: #f3cd7a;
+  --accent-border-soft: #8ecbf0;
+  --hw-border: #93c5fd;
+
+  --idle-bg: #e6eaf1;
+  --idle-text: #475569;
+  --field-bg: #e7ecf5;
+  --nav-active-bg: #dde6f2;
+  --step-active-bg: #dde6f2;
+  --ghost-active-bg: #dde6f2;
+  --cell-active-bg: #e2e8f5;
+
+  --muted-soft: #3f4d63;
+  --muted-dim: #7c8aa0;
+
+  --chart-axis: #94a3b8;
+  --chart-split: #e2e8f0;
 }
 
 * {
@@ -110,27 +194,44 @@ button:disabled {
   flex: none;
 }
 .sensor-pill.is-ok {
-  color: #86efac;
+  color: var(--green-text-soft);
 }
 .sensor-pill.is-ok .dot {
   background: var(--green);
 }
 .sensor-pill.is-bad {
-  color: #fca5a5;
+  color: var(--red-text-soft);
 }
 .sensor-pill.is-bad .dot {
   background: var(--red);
 }
 
 .mode-pill.is-sim {
-  color: #fcd34d;
-  border-color: #78560a;
-  background: rgba(245, 158, 11, 0.12);
+  color: var(--amber-text-soft);
+  border-color: var(--amber-border);
+  background: rgba(var(--amber-rgb), 0.12);
 }
 .mode-pill.is-hw {
-  color: #93c5fd;
-  border-color: #1e3a8a;
-  background: rgba(59, 130, 246, 0.12);
+  color: var(--hw-text);
+  border-color: var(--hw-border);
+  background: rgba(var(--hw-rgb), 0.12);
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--muted);
+}
+.theme-toggle:active {
+  background: var(--nav-active-bg);
+  color: var(--text);
 }
 
 /* Crimp screen: everything fits the screen - no scrolling anywhere.
@@ -196,7 +297,7 @@ button:disabled {
 }
 .calc__sub {
   margin-top: 2px;
-  color: #fcd34d;
+  color: var(--amber-text-soft);
 }
 
 /* ---------- mode nav (bottom bar) ---------- */
@@ -228,12 +329,12 @@ button:disabled {
   border-left: 1px solid var(--line);
 }
 .mode-nav__btn:active {
-  background: #1a2a48;
+  background: var(--nav-active-bg);
 }
 .mode-nav__btn.is-active {
   border-top-color: var(--accent);
-  background: rgba(56, 189, 248, 0.14);
-  color: #e0f2fe;
+  background: rgba(var(--accent-rgb), 0.14);
+  color: var(--accent-text-soft);
 }
 
 .mode-nav__title {
@@ -265,8 +366,8 @@ button:disabled {
   font-style: normal;
   font-weight: 800;
   letter-spacing: 0.08em;
-  background: rgba(245, 158, 11, 0.22);
-  color: #fcd34d;
+  background: rgba(var(--amber-rgb), 0.22);
+  color: var(--amber-text-soft);
   animation: pulse 1s ease-in-out infinite;
 }
 
@@ -302,7 +403,7 @@ button:disabled {
   line-height: 1;
 }
 .step-btn:active:not(:disabled) {
-  background: #1f2f4f;
+  background: var(--step-active-bg);
 }
 
 .field__input-wrap {
@@ -317,7 +418,7 @@ button:disabled {
   padding: 0 44px 0 10px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: #0e1626;
+  background: var(--field-bg);
   font-size: 30px;
   font-weight: 700;
   text-align: right;
@@ -381,7 +482,7 @@ button:disabled {
   color: var(--accent);
 }
 .field--primary .field__input-wrap input {
-  border-color: #1e5f8a;
+  border-color: var(--accent-border-soft);
 }
 
 .params-grid .field {
@@ -441,7 +542,7 @@ button:disabled {
 .calc {
   padding: 6px 10px;
   border-radius: 8px;
-  background: #0e1626;
+  background: var(--field-bg);
   border: 1px dashed var(--line);
   font-size: 12.5px;
   color: var(--muted);
@@ -451,8 +552,8 @@ button:disabled {
   color: var(--text);
 }
 .calc--bad {
-  color: #fca5a5;
-  border-color: #7f1d1d;
+  color: var(--red-text-soft);
+  border-color: var(--red-border);
 }
 
 .teach__btn {
@@ -468,8 +569,8 @@ button:disabled {
 }
 .teach__btn.is-armed {
   border-color: var(--amber);
-  background: rgba(245, 158, 11, 0.2);
-  color: #fde68a;
+  background: rgba(var(--amber-rgb), 0.2);
+  color: var(--amber-text-soft-2);
 }
 
 /* ---------- readouts ---------- */
@@ -507,7 +608,7 @@ button:disabled {
   color: var(--muted);
 }
 .readout__value--dia {
-  color: #f1f5f9;
+  color: var(--text);
 }
 .readout__value--disp {
   color: var(--cyan);
@@ -581,10 +682,10 @@ button:disabled {
   line-height: 1.1;
 }
 .counter--good .counter__value {
-  color: #86efac;
+  color: var(--green-text-soft);
 }
 .counter--bad .counter__value {
-  color: #fca5a5;
+  color: var(--red-text-soft);
 }
 .counter__plus {
   width: 30px;
@@ -597,7 +698,7 @@ button:disabled {
   line-height: 1;
 }
 .counter__plus:active {
-  background: rgba(239, 68, 68, 0.3);
+  background: rgba(var(--red-rgb), 0.3);
 }
 .counters__reset {
   align-self: center;
@@ -613,8 +714,8 @@ button:disabled {
 }
 .counters__reset.is-armed {
   border-color: var(--red);
-  background: rgba(239, 68, 68, 0.2);
-  color: #fecaca;
+  background: rgba(var(--red-rgb), 0.2);
+  color: var(--red-text-strong);
 }
 
 /* ---------- status ---------- */
@@ -652,22 +753,22 @@ button:disabled {
   text-align: right;
 }
 .badge--idle {
-  background: #1f2a3f;
-  color: #cbd5e1;
+  background: var(--idle-bg);
+  color: var(--idle-text);
 }
 .badge--running {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
+  background: rgba(var(--amber-rgb), 0.2);
+  color: var(--amber-text-soft);
   animation: pulse 1s ease-in-out infinite;
 }
 .badge--reached,
 .badge--complete {
-  background: rgba(34, 197, 94, 0.2);
-  color: #86efac;
+  background: rgba(var(--green-rgb), 0.2);
+  color: var(--green-text-soft);
 }
 .badge--fault {
-  background: rgba(239, 68, 68, 0.25);
-  color: #fecaca;
+  background: rgba(var(--red-rgb), 0.25);
+  color: var(--red-text-strong);
 }
 
 @keyframes pulse {
@@ -687,12 +788,12 @@ button:disabled {
   text-overflow: ellipsis;
 }
 .status__fault {
-  background: rgba(239, 68, 68, 0.2);
-  color: #fecaca;
+  background: rgba(var(--red-rgb), 0.2);
+  color: var(--red-text-strong);
 }
 .status__error {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fde68a;
+  background: rgba(var(--amber-rgb), 0.15);
+  color: var(--amber-text-soft-2);
 }
 
 .status__result {
@@ -707,11 +808,11 @@ button:disabled {
 }
 .status__oot {
   margin-left: 8px;
-  color: #fca5a5;
+  color: var(--red-text-soft);
   font-weight: 700;
 }
 .status__result-values {
-  color: #b8c7de;
+  color: var(--muted-soft);
   font-variant-numeric: tabular-nums;
 }
 
@@ -735,6 +836,15 @@ button:disabled {
   letter-spacing: 0.06em;
   color: #fff;
 }
+/* White text on a solid saturated background washes out under the generic
+   opacity-based :disabled dimming once the page behind it is light (white on
+   white, at 45% opacity, is close to invisible) - so disabled buttons swap to
+   a flat neutral fill instead of just fading. */
+.btn:disabled {
+  opacity: 1;
+  background: var(--idle-bg);
+  color: var(--idle-text);
+}
 .btn--start {
   background: var(--green-dark);
 }
@@ -752,7 +862,7 @@ button:disabled {
   margin: 0;
   font-size: 11px;
   line-height: 1.3;
-  color: #64748b;
+  color: var(--muted-dim);
   text-align: center;
 }
 
@@ -805,8 +915,8 @@ button:disabled {
   color: var(--muted);
 }
 .charts__toggle button.is-active {
-  background: rgba(56, 189, 248, 0.2);
-  color: #e0f2fe;
+  background: rgba(var(--accent-rgb), 0.2);
+  color: var(--accent-text-soft);
 }
 
 .charts__auto {
@@ -832,7 +942,7 @@ button:disabled {
   height: 24px;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: #0e1626;
+  background: var(--field-bg);
   transition: background 0.15s;
 }
 .auto-switch__thumb {
@@ -846,12 +956,12 @@ button:disabled {
   transition: transform 0.15s, background 0.15s;
 }
 .auto-switch.is-on .auto-switch__track {
-  background: rgba(56, 189, 248, 0.3);
+  background: rgba(var(--accent-rgb), 0.3);
   border-color: var(--accent);
 }
 .auto-switch.is-on .auto-switch__thumb {
   transform: translateX(20px);
-  background: #e0f2fe;
+  background: var(--accent-text-soft);
 }
 .auto-switch__text {
   font-size: 11.5px;
@@ -860,7 +970,7 @@ button:disabled {
   color: var(--muted);
 }
 .auto-switch.is-on .auto-switch__text {
-  color: #cfe8f7;
+  color: var(--accent-text-soft);
 }
 
 .charts__grid {
@@ -882,7 +992,7 @@ button:disabled {
 }
 .charts__cell:active,
 .charts__cell:focus-visible {
-  background: #15203a;
+  background: var(--cell-active-bg);
   outline: none;
 }
 .charts__expand {
@@ -978,11 +1088,11 @@ button:disabled {
   color: var(--text);
 }
 .ghost-btn:active:not(:disabled) {
-  background: #1f2f52;
+  background: var(--ghost-active-bg);
 }
 .ghost-btn--danger {
-  color: #fca5a5;
-  border-color: #7f1d1d;
+  color: var(--red-text-soft);
+  border-color: var(--red-border);
 }
 .ghost-btn--danger.is-armed {
   background: var(--red-dark);
@@ -1100,11 +1210,11 @@ button:disabled {
   letter-spacing: 0.08em;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(56, 189, 248, 0.2);
-  color: #bae6fd;
+  background: rgba(var(--accent-rgb), 0.2);
+  color: var(--accent-text-soft);
 }
 .recipe__tag--soft {
-  background: rgba(148, 163, 184, 0.16);
+  background: rgba(var(--slate-rgb), 0.16);
   color: var(--muted);
 }
 .recipe__grid {
@@ -1144,13 +1254,13 @@ button:disabled {
   gap: 8px;
   padding: 6px 10px;
   border-radius: 8px;
-  border: 1px solid #1e5f8a;
-  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid var(--accent-border-soft);
+  background: rgba(var(--accent-rgb), 0.1);
   font-size: 12.5px;
 }
 .recipe-chip.is-modified {
-  border-color: #78560a;
-  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--amber-border);
+  background: rgba(var(--amber-rgb), 0.12);
 }
 .recipe-chip em {
   font-style: normal;
@@ -1170,14 +1280,14 @@ button:disabled {
   min-height: 48px;
   border-radius: var(--radius);
   border: 1px solid var(--accent);
-  background: rgba(56, 189, 248, 0.14);
-  color: #e0f2fe;
+  background: rgba(var(--accent-rgb), 0.14);
+  color: var(--accent-text-soft);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.05em;
 }
 .save-recipe:active:not(:disabled) {
-  background: rgba(56, 189, 248, 0.3);
+  background: rgba(var(--accent-rgb), 0.3);
 }
 
 .modal {
@@ -1186,7 +1296,7 @@ button:disabled {
   z-index: 50;
   display: grid;
   place-items: center;
-  background: rgba(3, 7, 18, 0.72);
+  background: rgba(var(--backdrop-rgb), 0.72);
 }
 .modal__card {
   max-height: calc(100vh - 16px);
@@ -1221,7 +1331,7 @@ button:disabled {
   padding: 0 12px;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: #0b1424;
+  background: var(--field-bg);
   font-size: 18px;
   user-select: text;
   -webkit-user-select: text;
@@ -1262,7 +1372,7 @@ button:disabled {
 }
 .faq__item p {
   margin: 0 0 12px;
-  color: #b8c7de;
+  color: var(--muted-soft);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -1377,10 +1487,10 @@ button:disabled {
   color: var(--text);
 }
 .history__summary b.ok {
-  color: #86efac;
+  color: var(--green-text-soft);
 }
 .history__summary b.bad {
-  color: #fca5a5;
+  color: var(--red-text-soft);
 }
 .screen--fill {
   display: flex;
@@ -1441,7 +1551,7 @@ button:disabled {
 }
 .history__row--bad td:not(.history__note),
 .history__row--fault td:not(.history__note) {
-  background-image: linear-gradient(rgba(239, 68, 68, 0.07), rgba(239, 68, 68, 0.07));
+  background-image: linear-gradient(rgba(var(--red-rgb), 0.07), rgba(var(--red-rgb), 0.07));
 }
 .verdict {
   display: inline-block;
@@ -1452,21 +1562,21 @@ button:disabled {
   letter-spacing: 0.06em;
 }
 .verdict--good {
-  background: rgba(34, 197, 94, 0.2);
-  color: #86efac;
+  background: rgba(var(--green-rgb), 0.2);
+  color: var(--green-text-soft);
 }
 .verdict--bad,
 .verdict--fault {
-  background: rgba(239, 68, 68, 0.25);
-  color: #fecaca;
+  background: rgba(var(--red-rgb), 0.25);
+  color: var(--red-text-strong);
 }
 .verdict--stopped {
-  background: #1f2a3f;
-  color: #cbd5e1;
+  background: var(--idle-bg);
+  color: var(--idle-text);
 }
 .verdict--edited {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
+  background: rgba(var(--amber-rgb), 0.2);
+  color: var(--amber-text-soft);
 }
 .history__loading {
   padding: 14px;
@@ -1504,18 +1614,18 @@ button:disabled {
   font-variant-numeric: tabular-nums;
 }
 .recipe__usage .ok {
-  color: #86efac;
+  color: var(--green-text-soft);
 }
 .recipe__usage .bad {
-  color: #fca5a5;
+  color: var(--red-text-soft);
 }
 .db-error {
   margin-bottom: 12px;
   padding: 10px 14px;
   border-radius: var(--radius);
-  border: 1px solid #7f1d1d;
-  background: rgba(239, 68, 68, 0.12);
-  color: #fca5a5;
+  border: 1px solid var(--red-border);
+  background: rgba(var(--red-rgb), 0.12);
+  color: var(--red-text-soft);
   font-size: 13px;
 }
 .db-info {
@@ -1542,10 +1652,10 @@ button:disabled {
   -webkit-user-select: text;
 }
 .db-info.is-bad {
-  border-color: #7f1d1d;
+  border-color: var(--red-border);
 }
 .db-info.is-bad b {
-  color: #fca5a5;
+  color: var(--red-text-soft);
 }
 
 /* Tall windows: the parameter rows may grow a little more. */
@@ -1667,6 +1777,14 @@ button:disabled {
   .profile-pill {
     padding: 3px 8px;
     font-size: 11px;
+  }
+  .theme-toggle {
+    width: 26px;
+    height: 26px;
+  }
+  .theme-toggle svg {
+    width: 15px;
+    height: 15px;
   }
   .mode-nav__btn {
     min-height: 46px;

@@ -33,6 +33,12 @@ export const FAQ_SECTIONS: FaqSection[] = [
           'SIMULATION means no real machine is connected: pressure and displacement are simulated and nothing physical is switched. The sensor indicator shows the state of the two transducers and how often they are read (in Hz). START only works while the sensors are OK.',
         ],
       },
+      {
+        q: 'How do I switch between dark and light mode?',
+        a: [
+          'Tap the sun / moon icon at the far right of the header. Dark is the default (best in low light near the machine); light suits a bright shop floor. The choice is remembered on this device, so it stays set after a restart.',
+        ],
+      },
     ],
   },
   {
