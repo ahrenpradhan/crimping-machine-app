@@ -119,7 +119,7 @@ function startMachine(store: MachineStore | null, database: DatabaseStatus): voi
     simulation: SIMULATION,
     sampleRateHz: TIMING.sampleRateHz,
     uiRateHz: TIMING.uiRateHz,
-    geometry: GEOMETRY,
+    geometry: GEOMETRY, //test
     database,
     limits: {
       maxTargetDisplacementMm: LIMITS.maxTargetDisplacementMm,
